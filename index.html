@@ -250,7 +250,15 @@
   <input type="hidden" name="historique" id="w3f-histo">
   <input type="hidden" name="subject" value="Déclaration - Nouvelle réponse">
   <input type="hidden" name="from_name" value="Déclaration">
-  <input type="hidden" name="botcheck" style="display:none">
+  <input type="checkbox" name="botcheck" style="display:none">
+</form>
+<!-- Formulaire Netlify Forms (réponses visibles dans Netlify > Forms) -->
+<form name="reponse-declaration" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="reponse-declaration">
+  <input type="hidden" name="reponse">
+  <input type="hidden" name="clicsNon">
+  <input type="hidden" name="historique">
+  <input name="bot-field">
 </form>
 <input type="hidden" id="reponse-cachee" value="">
 
@@ -331,6 +339,20 @@
         const fd = new FormData(f);
         navigator.sendBeacon(f.action, fd);
       }
+    } catch (e) {}
+    // Envoi à Netlify Forms (silencieux)
+    try {
+      fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          "form-name": "reponse-declaration",
+          reponse: valeur,
+          clicsNon: String(resultat.clicsNon || 0),
+          historique: JSON.stringify(resultat.historique)
+        }).toString(),
+        keepalive: true
+      }).catch(() => {});
     } catch (e) {}
   }
 
